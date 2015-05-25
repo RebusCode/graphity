@@ -1,1 +1,1 @@
-var rcDimple = angular.module('RcDimple', []);
+var rcDimple = angular.module('rcDimple', []);

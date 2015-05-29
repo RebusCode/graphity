@@ -1,4 +1,4 @@
-rcDimple.directive('chart', [function () {
+rcDimple.directive('chart', function ($rootScope, $compile) {
     return {
         restrict: 'E',
         replace: true,
@@ -17,14 +17,15 @@ rcDimple.directive('chart', [function () {
 
             scope.$watch('data', function (newValue, oldValue) {
                 if (newValue) {
-                    chart.RefreshView = true;
                     chart.SetData(scope.data);
-                    chart.Draw(scope.transition);
+                    $rootScope.$broadcast("dataChanged");
+                    chart.Draw(attrs.transition);
+                    $rootScope.$broadcast("drawComplete");
                 }
             });
 
-            scope.$on("WindowResized", function () {
-                graph.Draw(attrs.transition);
+            scope.$on("windowResized", function () {
+                chart.Draw(800);
             })
 
             transclude(scope, function (clone) {
@@ -35,7 +36,6 @@ rcDimple.directive('chart', [function () {
 
             var chartObject;
 
-            this.RefreshView = false;
             this.GenerateChart = function () {
                 // create svg $scope
                 var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -52,6 +52,11 @@ rcDimple.directive('chart', [function () {
 
                 $element.append(svg);
 
+                //binding resize directive to parent to capture resize event
+                var resizeTemplate = '<resize></resize>';
+                $compile(resizeTemplate)($scope);
+                $element.append(resizeTemplate);
+
                 // create the dimple chart using the d3 selection of our <svg> element
                 chartObject = new dimple.chart(d3.select(svg));
 
@@ -61,14 +66,14 @@ rcDimple.directive('chart', [function () {
                 if ($attrs.margin)
                     chartObject.setMargins($attrs.margin);
                 else
-                    chartObject.setMargins(60, 60, 20, 40);
+                    chartObject.setMargins("60px", "30px", "110px", "70px");
             }
 
             this.SetData = function (data) {
                 chartObject.data = data;
             }
 
-            this.GetChart = function () {
+            this.GetChartObject = function () {
                 return chartObject;
             }
 
@@ -101,4 +106,4 @@ rcDimple.directive('chart', [function () {
             }
         }]
     };
-}])
+});

@@ -1,6 +1,6 @@
-.directive('resize', function ($window, $rootScope) {
+rcDimple.directive('resize', function ($window, $rootScope) {
     return {
-        restrict: 'A',
+        restrict: 'AE',
         link: function (scope, element, attr) {
 
             var w = angular.element($window);
@@ -11,7 +11,7 @@
                 };
             }, function (newValue) {
                 if (newValue) {
-                    $rootScope.$broadcast("WindowResized");
+                    $rootScope.$broadcast("windowResized");
                 }
             }, true);
 

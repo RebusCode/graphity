@@ -9,12 +9,36 @@
 
 <body ng-controller="MainController">
 
-    <chart data="data" height="100%" width="100%">
-        <x field="Month"></x>
-        <y field="Unit Sales"></y>
-        <legend enable-click="true" field="Channel"></legend>
-        <line field="Channel"></line>
-    </chart>
+
+    <div id="chartContainer" style="height: 50%">
+        <chart data="data">
+            <x field="Month"></x>
+            <y field="Unit Sales"></y>
+
+            <!--
+            <legend enable-click="true" field="Channel"></legend>
+            <line field="Channel"></line>
+-->
+
+        </chart>
+    </div>
+
+
+    <div id="chartContainer1" style="height: 50%">
+        <chart data="data">
+            <y type="category" field="Month"></y>
+            <x type="measure" field="Unit Sales"></x>
+
+            <!--
+            <legend enable-click="true" field="Channel"></legend>
+<bar field="Channel"></bar>
+-->
+
+
+        </chart>
+    </div>
+
+
 
 
 </body>
@@ -26,15 +50,17 @@
 <!--charting libraries
 =================================================== -->
 <script src="lib/d3.v3.4.8.min.js"></script>
-<script src="lib/dimple.latest.min.js"></script>
+<script src="lib/dimple.latest.js"></script>
 
 <!-- User defined Angular scripts
 =================================================== -->
 <!--startUps-->
+<script src="script/dependencies/d3.module.js"></script>
+<script src="script/dependencies/dimple.module.js"></script>
 <script src="script/app.js"></script>
-<!--<script src="scripts/config/config.js"></script>-->
 
 <!--services-->
+<script src="script/factory/chartClass.js"></script>
 
 <!--directive-->
 <script src="script/directives/resize.js"></script>
@@ -43,6 +69,7 @@
 <script src="script/directives/yaxis.js"></script>
 <script src="script/directives/legend.js"></script>
 <script src="script/directives/line.js"></script>
+<script src="script/directives/bar.js"></script>
 
 <!--controllers-->
 <script src="script/controllers/maincontroller.js"></script>

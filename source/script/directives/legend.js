@@ -1,4 +1,4 @@
-rcDimple.directive('legend', function () {
+rcDimple.directive('legend', ['d3', 'dimple', function (d3, dimple) {
     return {
         restrict: 'E',
         replace: true,
@@ -9,24 +9,26 @@ rcDimple.directive('legend', function () {
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
-            var chartObject = chart.GetChartObject();
+            chart.RegisterToParent(scope.$id);
 
             function addLegend() {
-                var left = attrs.left ? attrs.left : "-100px";
-                var top = attrs.top ? attrs.top : "30px";
-                var height = attrs.height ? attrs.height : "-70px";
-                var width = attrs.width ? attrs.width : "100px";
+                var left = attrs.left ? attrs.left : "10%";
+                var top = attrs.top ? attrs.top : "5%";
+                var height = attrs.height ? attrs.height : "20%";
+                var width = attrs.width ? attrs.width : "80%";
                 var position = attrs.position ? attrs.position : 'right';
-                var legends = chartObject.addLegend(left, top, width, height, position);
+                var legends = chart.ChartObject.addLegend(left, top, width, height, position);
 
                 if (scope.enableClick)
-                    chart.onLegendClick = addOnClick;
+                    chart.Events.onLegendClick = addOnClick;
             }
 
-            function addOnClick(legends) {
-                chartObject.legends = [];
+            function addOnClick(chartObject) {
+                var legends = chart.ChartObject.legends[0];
+
+                chart.ChartObject.legends = [];
                 // Get a unique list
-                var filterValues = dimple.getUniqueValues(chartObject.data, scope.field);
+                var filterValues = dimple.getUniqueValues(chart.ChartObject.data, scope.field);
                 // Get all the rectangles from our now orphaned legend
                 legends.shapes.selectAll("rect")
                     // Add a click event to each rectangle
@@ -56,9 +58,31 @@ rcDimple.directive('legend', function () {
                     });
             }
 
-            scope.$on("dataChanged", function () {
-                addLegend();
-            })
+            function removeLegends(chartObject) {
+                chartObject.svg
+                    .selectAll(".dimple-legend")
+                    .remove();
+            }
+
+            //            scope.$on("dataChanged", function (event, chart) {
+            //                addLegend(chart);
+            //            })
+            //
+            //            scope.$on("resize", function (event, chart) {
+            //                removeLegends(chart.ChartObject);
+            //                addLegend();
+            //            })
+
+            scope.$watch(function () {
+                    return chart.DataChanged;
+                },
+                function (newVal) {
+                    if (newVal === true) {
+                        addLegend(chart);
+                        chart.BindComplete(scope.$id);
+                    }
+                });
+
         }
     };
-})
+}])

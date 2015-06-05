@@ -1,4 +1,4 @@
-rcDimple.directive('chart', function ($rootScope, $compile) {
+rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($rootScope, $compile, $window) {
     return {
         restrict: 'E',
         replace: true,
@@ -15,26 +15,33 @@ rcDimple.directive('chart', function ($rootScope, $compile) {
             var chart = controllers[0];
             chart.GenerateChart();
 
+            var aa, bb;
+
             scope.$watch('data', function (newValue, oldValue) {
                 if (newValue) {
                     chart.SetData(scope.data);
-                    $rootScope.$broadcast("dataChanged");
-                    chart.Draw(attrs.transition);
-                    $rootScope.$broadcast("drawComplete");
+                    chart.DataChanged = true;
+                    aa = chart.ChartObject;
                 }
             });
 
-            scope.$on("windowResized", function () {
-                chart.Draw(800);
-            })
+            angular.element($window).on('resize', function (e) {
+                bb = chart.ChartObject;
+                chart.Draw(0, true);
+            });
 
             transclude(scope, function (clone) {
                 element.append(clone);
             });
         },
-        controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
+        controller: ['$scope', '$element', '$attrs', 'd3', 'dimple', function ($scope, $element, $attrs, d3, dimple) {
+            //Private variables
+            var children = {};
 
-            var chartObject;
+            //Public variables
+            this.ChartObject = {};
+            this.DataChanged = false;
+            this.Events = {};
 
             this.GenerateChart = function () {
                 // create svg $scope
@@ -50,35 +57,31 @@ rcDimple.directive('chart', function ($rootScope, $compile) {
                 else
                     svg.setAttribute('height', '100%');
 
-                $element.append(svg);
-
-                //binding resize directive to parent to capture resize event
-                var resizeTemplate = '<resize></resize>';
-                $compile(resizeTemplate)($scope);
-                $element.append(resizeTemplate);
+                $element.parent().append(svg);
 
                 // create the dimple chart using the d3 selection of our <svg> element
-                chartObject = new dimple.chart(d3.select(svg));
+                this.ChartObject = new dimple.chart(d3.select(svg));
 
                 // auto style
-                chartObject.noFormats = $attrs.autoStyle === 'false' ? true : false;
+                this.ChartObject.noFormats = $attrs.autoStyle === 'false' ? true : false;
 
                 if ($attrs.margin)
-                    chartObject.setMargins($attrs.margin);
+                    this.ChartObject.setMargins($attrs.margin);
                 else
-                    chartObject.setMargins("60px", "30px", "110px", "70px");
+                    this.ChartObject.setMargins("60px", "30px", "110px", "70px");
             }
 
             this.SetData = function (data) {
-                chartObject.data = data;
+                this.ChartObject.data = data;
             }
 
             this.GetChartObject = function () {
-                return chartObject;
+                return this.ChartObject;
             }
 
-            this.Draw = function (transition) {
-                chartObject.draw(transition || 800);
+            this.Draw = function (transition, noDataChange) {
+                this.ChartObject.draw(transition || 800, noDataChange);
+                this.DataChanged = false;
             }
 
             this.FilterData = function (filter, field) {
@@ -89,21 +92,37 @@ rcDimple.directive('chart', function ($rootScope, $compile) {
                         var field = filterData[0];
                         var value = [filterData[1]];
 
-                        chartObject.data = dimple.filterData($scope.data, field, value);
-                        chartObject.draw(800);
+                        this.ChartObject.data = dimple.filterData($scope.data, field, value);
+                        this.Draw(800);
                     } else if (filter.indexOf(':') === -1) {
-                        chartObject.data = dimple.filterData($scope.data, field, filter);
-                        chartObject.draw(800);
+                        this.ChartObject.data = dimple.filterData($scope.data, field, filter);
+                        this.Draw(800);
                     }
                 } else if (Array.isArray(filter)) {
-                    chartObject.data = dimple.filterData($scope.data, field, filter);
-                    chartObject.draw(800);
+                    this.ChartObject.data = dimple.filterData($scope.data, field, filter);
+                    this.Draw(800);
                 }
             }
 
             this.GetUniqueValues = function (fields) {
                 return dimple.getUniqueValues($scope.data, fields);
             }
+
+            this.RegisterToParent = function (childId) {
+                children[childId] = false;
+            }
+
+            this.BindComplete = function (childId) {
+                children[childId] = true;
+                for (var id in children)
+                    if (children[id] === false)
+                        return;
+
+                this.Draw($attrs.transition);
+                for (var event in this.Events)
+                    if (typeof this.Events[event] === 'function')
+                        this.Events[event](this.ChartObject);
+            }
         }]
     };
-});
+ }]);

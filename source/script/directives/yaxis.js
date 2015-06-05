@@ -12,22 +12,27 @@ rcDimple.directive('y', function () {
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
-            var chartObject = chart.GetChartObject();
+            chart.RegisterToParent(scope.$id);
 
             function drawAxis() {
                 var yAxis;
                 scope.type = scope.type || '';
+
                 switch (scope.type.toLowerCase()) {
                 case 'category':
-                    yAxis = chartObject.addCategoryAxis('y', scope.field);
+                    yAxis = chart.ChartObject.addCategoryAxis('y', scope.field);
+                    break;
                 case 'percent':
-                    yAxis = chartObject.addPctAxis('y', scope.field);
+                    yAxis = chart.ChartObject.addPctAxis('y', scope.field);
+                    break;
                 case 'time':
-                    yAxis = chartObject.addTimeAxis('y', scope.field);
+                    yAxis = chart.ChartObject.addTimeAxis('y', scope.field);
                     if (scope.format)
                         yAxis.tickFormat = scope.format;
+                    break;
                 default:
-                    yAxis = chartObject.addMeasureAxis('y', scope.field);
+                    yAxis = chart.ChartObject.addMeasureAxis('y', scope.field);
+                    break;
                 }
 
                 if (scope.orderBy && scope.orderBy !== '') {
@@ -43,9 +48,15 @@ rcDimple.directive('y', function () {
                     yAxis.title = null;
             }
 
-            scope.$on("dataChanged", function () {
-                drawAxis();
-            })
+            scope.$watch(function () {
+                    return chart.DataChanged;
+                },
+                function (newVal) {
+                    if (newVal === true) {
+                        drawAxis();
+                        chart.BindComplete(scope.$id);
+                    }
+                });
         }
     }
 })

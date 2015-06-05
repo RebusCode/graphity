@@ -1,4 +1,4 @@
-rcDimple.directive('line', function () {
+rcDimple.directive('line', ['dimple', function (dimple) {
     return {
         restrict: 'E',
         replace: true,
@@ -9,27 +9,28 @@ rcDimple.directive('line', function () {
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
-            var chartObject = chart.GetChartObject();
+            chart.RegisterToParent(scope.$id);
 
             function drawLine() {
-                var line;
-                var filteredData;
+                var line,
+                    field = scope.field ? [scope.field] : null;
 
-                line = chartObject.addSeries([scope.field], dimple.plot.line);
+                line = chart.ChartObject.addSeries(field, dimple.plot.line);
                 if (scope.filter)
                     chart.ApplyFilter(scope.filter);
 
                 line.lineMarkers = true;
             }
 
-            scope.$on("dataChanged", function () {
-                drawLine();
-            })
-
-            scope.$on("drawComplete", function () {
-                if (chart.onLegendClick)
-                    chart.onLegendClick(chartObject.legends[0])
-            })
+            scope.$watch(function () {
+                    return chart.DataChanged;
+                },
+                function (newVal) {
+                    if (newVal === true) {
+                        drawLine();
+                        chart.BindComplete(scope.$id);
+                    }
+                });
         }
     };
-})
+}]);

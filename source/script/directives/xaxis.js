@@ -13,7 +13,7 @@ rcDimple.directive('x', function () {
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
-            var chartObject = chart.GetChartObject();
+            chart.RegisterToParent(scope.$id);
 
             function drawAxis() {
                 var xAxis;
@@ -21,20 +21,24 @@ rcDimple.directive('x', function () {
                 switch (scope.type.toLowerCase()) {
                 case 'measure':
                     if (scope.groupBy && scope.groupBy !== '')
-                        xAxis = chartObject.addMeasureAxis('x', [scope.groupBy, scope.field]);
+                        xAxis = chart.ChartObject.addMeasureAxis('x', [scope.groupBy, scope.field]);
                     else
-                        xAxis = chartObject.addMeasureAxis('x', scope.field);
+                        xAxis = chart.ChartObject.addMeasureAxis('x', scope.field);
+                    break;
                 case 'percent':
-                    xAxis = chartObject.addPctAxis('x', scope.field);
+                    xAxis = chart.ChartObject.addPctAxis('x', scope.field);
+                    break;
                 case 'time':
-                    xAxis = chartObject.addTimeAxis('x', scope.field);
+                    xAxis = chart.ChartObject.addTimeAxis('x', scope.field);
                     if (scope.format)
                         xAxis.tickFormat = scope.format;
+                    break;
                 default:
                     if (scope.groupBy && scope.groupBy !== '')
-                        xAxis = chartObject.addCategoryAxis('x', [scope.groupBy, scope.field]);
+                        xAxis = chart.ChartObject.addCategoryAxis('x', [scope.groupBy, scope.field]);
                     else
-                        xAxis = chartObject.addCategoryAxis('x', scope.field);
+                        xAxis = chart.ChartObject.addCategoryAxis('x', scope.field);
+                    break;
                 }
 
                 if (scope.orderBy && scope.orderBy !== '') {
@@ -50,9 +54,15 @@ rcDimple.directive('x', function () {
                     xAxis.title = null;
             }
 
-            scope.$on("dataChanged", function () {
-                drawAxis();
-            })
+            scope.$watch(function () {
+                    return chart.DataChanged;
+                },
+                function (newVal) {
+                    if (newVal === true) {
+                        drawAxis();
+                        chart.BindComplete(scope.$id);
+                    }
+                });
         }
     };
 });

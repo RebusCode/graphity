@@ -15,19 +15,16 @@ rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($roo
             var chart = controllers[0];
             chart.GenerateChart();
 
-            var aa, bb;
-
             scope.$watch('data', function (newValue, oldValue) {
                 if (newValue) {
                     chart.SetData(scope.data);
                     chart.DataChanged = true;
-                    aa = chart.ChartObject;
                 }
             });
 
             angular.element($window).on('resize', function (e) {
-                bb = chart.ChartObject;
-                chart.Draw(0, true);
+                chart.Resize();
+                scope.$apply();
             });
 
             transclude(scope, function (clone) {
@@ -36,11 +33,13 @@ rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($roo
         },
         controller: ['$scope', '$element', '$attrs', 'd3', 'dimple', function ($scope, $element, $attrs, d3, dimple) {
             //Private variables
-            var children = {};
+            var children = {},
+                childrenToTrack = [];
 
             //Public variables
             this.ChartObject = {};
             this.DataChanged = false;
+            this.ChartResized = false;
             this.Events = {};
 
             this.GenerateChart = function () {
@@ -80,8 +79,9 @@ rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($roo
             }
 
             this.Draw = function (transition, noDataChange) {
-                this.ChartObject.draw(transition || 800, noDataChange);
+                this.ChartObject.draw(transition, noDataChange);
                 this.DataChanged = false;
+                this.ChartResized = false;
             }
 
             this.FilterData = function (filter, field) {
@@ -108,8 +108,11 @@ rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($roo
                 return dimple.getUniqueValues($scope.data, fields);
             }
 
-            this.RegisterToParent = function (childId) {
+            this.RegisterToParent = function (childId, trackOnResize) {
+                trackOnResize = trackOnResize || false;
                 children[childId] = false;
+                if (trackOnResize)
+                    childrenToTrack.push(childId);
             }
 
             this.BindComplete = function (childId) {
@@ -118,10 +121,20 @@ rcDimple.directive('chart', ["$rootScope", "$compile", "$window", function ($roo
                     if (children[id] === false)
                         return;
 
-                this.Draw($attrs.transition);
+                var noDataChange = this.ChartResized ? true : false;
+                this.Draw($attrs.transition, noDataChange);
                 for (var event in this.Events)
                     if (typeof this.Events[event] === 'function')
                         this.Events[event](this.ChartObject);
+            }
+
+            this.Resize = function () {
+                if (childrenToTrack.length > 0) {
+                    for (var id in childrenToTrack)
+                        children[childrenToTrack[id]] = false;
+                    this.ChartResized = true;
+                } else
+                    this.Draw($attrs.transition);
             }
         }]
     };

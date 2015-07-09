@@ -9,7 +9,7 @@ rcDimple.directive('legend', ['d3', 'dimple', function (d3, dimple) {
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
-            chart.RegisterToParent(scope.$id);
+            chart.RegisterToParent(scope.$id, true);
 
             function addLegend() {
                 var left = attrs.left ? attrs.left : "10%";
@@ -58,27 +58,29 @@ rcDimple.directive('legend', ['d3', 'dimple', function (d3, dimple) {
                     });
             }
 
-            function removeLegends(chartObject) {
-                chartObject.svg
+            function removeLegends() {
+                chart.ChartObject.svg
                     .selectAll(".dimple-legend")
                     .remove();
             }
-
-            //            scope.$on("dataChanged", function (event, chart) {
-            //                addLegend(chart);
-            //            })
-            //
-            //            scope.$on("resize", function (event, chart) {
-            //                removeLegends(chart.ChartObject);
-            //                addLegend();
-            //            })
 
             scope.$watch(function () {
                     return chart.DataChanged;
                 },
                 function (newVal) {
                     if (newVal === true) {
-                        addLegend(chart);
+                        addLegend();
+                        chart.BindComplete(scope.$id);
+                    }
+                });
+
+            scope.$watch(function () {
+                    return chart.ChartResized;
+                },
+                function (newVal) {
+                    if (newVal === true) {
+                        removeLegends();
+                        addLegend();
                         chart.BindComplete(scope.$id);
                     }
                 });

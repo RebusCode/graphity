@@ -3,27 +3,29 @@ rcDimple.directive('legend', ['d3', 'dimple', function (d3, dimple) {
         restrict: 'E',
         replace: true,
         scope: {
-            enableClick: '=',
+            enableClick: '@',
             field: '@'
         },
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
             chart.RegisterToParent(scope.$id, true);
+            chart.Events[scope.$id] = {};
 
             function addLegend() {
-                var left = attrs.left ? attrs.left : "10%";
-                var top = attrs.top ? attrs.top : "5%";
-                var height = attrs.height ? attrs.height : "20%";
-                var width = attrs.width ? attrs.width : "80%";
+                var x = attrs.x ? attrs.x : "10%";
+                var y = attrs.y ? attrs.y : "5%";
+                var height = attrs.height ? attrs.height : "100%";
+                var width = attrs.width ? attrs.width : "10%";
                 var position = attrs.position ? attrs.position : 'right';
-                var legends = chart.ChartObject.addLegend(left, top, width, height, position);
+                //var legend = calculateLegend('right');
+                var legends = chart.ChartObject.addLegend(x, y, width, height, position);
 
                 if (scope.enableClick)
-                    chart.Events.onLegendClick = addOnClick;
+                    chart.Events[scope.$id].onLegendClick = addOnClick;
             }
 
-            function addOnClick(chartObject) {
+            function addOnClick() {
                 var legends = chart.ChartObject.legends[0];
 
                 chart.ChartObject.legends = [];
@@ -56,6 +58,42 @@ rcDimple.directive('legend', ['d3', 'dimple', function (d3, dimple) {
                         // Filter the data
                         chart.FilterData(filterValues, scope.field);
                     });
+            }
+
+            function calculateLegend(position) {
+                var legend = {
+                    x: 0,
+                    y: 0,
+                    height: 0,
+                    width: 0
+                }
+                switch (position.toLowerCase()) {
+                case 'bottom':
+                    legend.x = 0;
+                    legend.y = 300; //height of svg
+                    legend.height = '10%';
+                    legend.width = "100%";
+                    break;
+                case 'top':
+                    legend.x = 0;
+                    legend.y = 0; //height of svg
+                    legend.height = '10%';
+                    legend.width = "100%";
+                    break;
+                case 'right':
+                    legend.x = 1200;
+                    legend.y = 0; //height of svg
+                    legend.height = '100%';
+                    legend.width = "10%";
+                    break;
+                case 'left':
+                    legend.x = '20%,60px';
+                    legend.y = 0; //height of svg
+                    legend.height = '100%';
+                    legend.width = "10%";
+                    break;
+                }
+                return legend;
             }
 
             function removeLegends() {

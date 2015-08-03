@@ -1,25 +1,18 @@
-rcDimple.directive('line', ['dimple', function (dimple) {
+rcDimple.directive('z', ['$filter', 'd3', function ($filter, d3) {
     return {
         restrict: 'E',
         replace: true,
         scope: {
-            field: '@',
-            filter: '@'
+            field: '@'
         },
         require: ['^chart'],
         link: function (scope, element, attrs, controllers) {
             var chart = controllers[0];
             chart.RegisterToParent(scope.$id);
+            chart.Events[scope.$id] = {};
 
-            function drawLine() {
-                var line,
-                    field = scope.field ? [scope.field] : null;
-
-                line = chart.ChartObject.addSeries(field, dimple.plot.line);
-                if (scope.filter)
-                    chart.ApplyFilter(scope.filter);
-
-                line.lineMarkers = true;
+            function drawAxis() {
+                var zAxis = chart.ChartObject.addMeasureAxis('z', scope.field);
             }
 
             scope.$watch(function () {
@@ -27,10 +20,10 @@ rcDimple.directive('line', ['dimple', function (dimple) {
                 },
                 function (newVal) {
                     if (newVal === true) {
-                        drawLine();
+                        drawAxis();
                         chart.BindComplete(scope.$id);
                     }
                 });
         }
-    };
+    }
 }]);

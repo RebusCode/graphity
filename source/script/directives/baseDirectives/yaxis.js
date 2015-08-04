@@ -73,7 +73,7 @@ rcDimple.directive('y', ['$filter', 'd3', 'enums', function ($filter, d3, enums)
                 if (scope.majorInterval)
                     yAxis.ticks = scope.majorInterval;
 
-                //chart.Events[scope.$id].yTextTransformation = textTransformation;
+                chart.Events[scope.$id].yTextTransformation = textTransformation;
             }
 
             function textTransformation() {

@@ -7,7 +7,6 @@ rcDimple.directive('bar', ['dimple', '$filter', 'enums', function (dimple, $filt
             filter: '@',
             yaxis: '@',
             data: '=',
-            //color: '=', //should be an object with key as series name and value as color to assign ( example : {'Hypermarkets':'red', 'Supermarkets' : '#FFDAB9'})
             type: '@' //should be an enum value
         },
         require: ['^chart'],

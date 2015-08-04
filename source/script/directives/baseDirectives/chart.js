@@ -16,7 +16,6 @@ rcDimple.directive('chart', ["$window", function ($window) {
         transclude: true,
         link: function (scope, element, attrs, controllers, transclude) {
             var chart = controllers[0];
-            //chart.GenerateChart();
 
             scope.$watch('data', function (newValue, oldValue) {
                 if (newValue && newValue !== oldValue && newValue.length > 0) {

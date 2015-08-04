@@ -6,8 +6,6 @@ rcDimple.directive('line', ['dimple', '$filter', function (dimple, $filter) {
             field: '@',
             filter: '@',
             yaxis: '@',
-            //name: '@',
-            //            color: '=', //should be an object with key as series name and value as color to assign ( example : {'Hypermarkets':'red', 'Supermarkets' : '#FFDAB9'})
             data: '='
         },
         require: ['^chart'],

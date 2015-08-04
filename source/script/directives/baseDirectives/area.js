@@ -7,7 +7,6 @@ rcDimple.directive('area', ['dimple', '$filter', function (dimple, $filter) {
             filter: '@',
             yaxis: '@',
             data: '='
-                //color: '=', //should be an object with key as series name and value as color to assign ( example : {'Hypermarkets':'red', 'Supermarkets' : '#FFDAB9'})
         },
         require: ['^chart'],
         controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {}],

@@ -28,7 +28,7 @@ rcDimple.directive('bubble', ['dimple', '$filter', function (dimple, $filter) {
                     if (ys.length > 1) {
                         var x = $filter('filter')(chart.ChartObject.axes, {
                             position: 'x'
-                        });
+                        })[0];
 
                         var y = $filter('filter')(chart.ChartObject.axes, {
                             position: 'y'

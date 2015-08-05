@@ -53,9 +53,6 @@ rcDimple.directive('bar', ['dimple', '$filter', 'enums', function (dimple, $filt
                 } else
                     bar = chart.ChartObject.addSeries(field, dimple.plot.bar);
 
-
-                bar = chart.ChartObject.addSeries(field, dimple.plot.bar);
-
                 if (scope.data)
                     bar.data = scope.data;
             }

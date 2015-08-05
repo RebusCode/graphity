@@ -82,7 +82,7 @@ rcDimple.controller("MainController", ['$scope', '$location', '$timeout', 'Chart
     $scope.options.Series["Aperture"] = $scope.Series1;
 
     $scope.Series2 = new ChartProperties.Series();
-    $scope.Series2.SeriesColor = "red";
+    $scope.Series2.SeriesColor = "yellow";
     $scope.Series2.SeriesDisplayAs = enums.ChartType.StackedColumn;
     $scope.Series2.SeriesYAxis = enums.YAxes.Y2;
     $scope.Series2.SeriesDataPrefix = "rcp ";

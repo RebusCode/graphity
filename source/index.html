@@ -8,6 +8,10 @@
 </head>
 
 <body ng-controller="MainController">
+    <select id="measure" class="form-control" ng-options="o.key as o.value for o in ChartTypes" ng-model="ChartType">
+        <option style="display: none" value="">-- Select Measure --</option>
+    </select>
+    <input type="button" ng-click="Change()" value="click" />
 
 
     <div id="chartContainer2" style="height: 100%">

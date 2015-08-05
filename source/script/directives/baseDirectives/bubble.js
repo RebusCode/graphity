@@ -7,7 +7,6 @@ rcDimple.directive('bubble', ['dimple', '$filter', function (dimple, $filter) {
             filter: '@',
             yaxis: '@',
             data: '='
-                //color: '=', //should be an object with key as series name and value as color to assign ( example : {'Hypermarkets':'red', 'Supermarkets' : '#FFDAB9'})
         },
         require: ['^chart'],
         controller: ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {}],
@@ -28,7 +27,7 @@ rcDimple.directive('bubble', ['dimple', '$filter', function (dimple, $filter) {
                     if (ys.length > 1) {
                         var x = $filter('filter')(chart.ChartObject.axes, {
                             position: 'x'
-                        });
+                        })[0];
 
                         var y = $filter('filter')(chart.ChartObject.axes, {
                             position: 'y'

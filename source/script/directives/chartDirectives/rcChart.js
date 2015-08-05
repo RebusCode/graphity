@@ -462,15 +462,6 @@ rcDimple.directive('rcChart', ['$compile', '$filter', function ($compile, $filte
                                 this.ErrorList['bar'].push(y + ' axis configured incorrectlly');
                             }
 
-<<<<<<< HEAD
-                            //                        if (Object.keys(color).length > 0)
-                            //                            element.attr('color', JSON.stringify(color));
-                            //
-                            //                        if (data && data.length > 0)
-                            //                            element.attr('data', JSON.stringify(data));
-
-=======
->>>>>>> origin/master
                         if (elementName)
                             element.attr('data', "distributedData['" + elementName + "']");
 

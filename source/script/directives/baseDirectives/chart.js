@@ -28,6 +28,7 @@ rcDimple.directive('chart', ["$window", function ($window) {
                 if (newValue && newValue === 'true') {
                     chart.ChartObject = {};
                     chart.GenerateChart();
+                    chart.SetData(scope.data);
                     chart.DataChanged = true;
                     scope.draw = false;
                 }

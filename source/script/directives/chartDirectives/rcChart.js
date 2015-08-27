@@ -125,6 +125,8 @@ rcDimple.directive('rcChart', ['$compile', '$filter', function ($compile, $filte
                 var elementKey = chatType + '@' + (yaxis === null ? enums.YAxes.Y : yaxis);
                 if (data)
                     $scope.distributeData[elementKey] = data;
+                else
+                    elementKey = null;
 
                 switch (CheckNumber(chatType)) {
                 case enums.ChartType.Line:
